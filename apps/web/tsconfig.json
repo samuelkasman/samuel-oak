@@ -5,7 +5,11 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@samuel-oak/db": ["../../packages/db/src"]
+    }
   },
   "include": [
     "**/*.ts",

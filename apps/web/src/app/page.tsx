@@ -1,6 +1,9 @@
+"use client";
+
 import Image, { type ImageProps } from "next/image";
 import { Button } from "@repo/ui/button";
 import styles from "./page.module.css";
+import { trpc } from "../lib/trpc";
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
@@ -19,6 +22,13 @@ const ThemeImage = (props: Props) => {
 };
 
 export default function Home() {
+  const helloQuery = trpc.hello.useQuery({ name: "from Next.js" });
+  const greetingMessage = helloQuery.isLoading
+    ? "Contacting tRPC API…"
+    : helloQuery.error
+      ? `tRPC error: ${helloQuery.error.message}`
+      : helloQuery.data?.message ?? "No message returned";
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -35,6 +45,7 @@ export default function Home() {
           <li>
             This is the web app
           </li>
+          <li>{greetingMessage}</li>
         </ol>
 
         <div className={styles.ctas}>

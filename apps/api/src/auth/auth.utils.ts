@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { apiEnv } from "../config/env";
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecret"; // Use env var in prod
+const JWT_SECRET = apiEnv.jwtSecret;
 const JWT_EXPIRES_IN = "1h"; // token expiration
 
 // Hash password
