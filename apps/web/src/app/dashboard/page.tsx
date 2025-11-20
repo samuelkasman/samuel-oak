@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  Box,
-  Container,
-  Grid2 as Grid,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Grid2 as Grid, Paper, Stack, Typography } from "@mui/material";
+import { AuthGuard } from "../../components/auth";
+import { DashboardLayout } from "../../components/layouts";
 import { trpc } from "../../lib/trpc";
 
 export default function DashboardPage() {
@@ -19,18 +14,12 @@ export default function DashboardPage() {
       : helloQuery.data?.message ?? "Connected to tRPC backend";
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        bgcolor: (theme) => theme.palette.background.default,
-        py: { xs: 6, md: 10 },
-      }}
-    >
-      <Container maxWidth="lg">
+    <AuthGuard loadingMessage="Verifying your session…">
+      <DashboardLayout title="Dashboard">
         <Stack spacing={4}>
           <Stack spacing={1}>
             <Typography variant="h4" component="h1" fontWeight={700}>
-              Dashboard
+              Overview
             </Typography>
             <Typography variant="body1" color="text.secondary">
               This is your secure workspace.
@@ -62,8 +51,8 @@ export default function DashboardPage() {
             </Grid>
           </Grid>
         </Stack>
-      </Container>
-    </Box>
+      </DashboardLayout>
+    </AuthGuard>
   );
 }
 

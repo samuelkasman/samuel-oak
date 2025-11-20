@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, type FormEventHandler } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Stack, TextField } from "@mui/material";
@@ -22,7 +23,8 @@ export function RegisterForm({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting, touchedFields },
+    watch,
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -32,17 +34,42 @@ export function RegisterForm({
     },
   });
 
-  const pending = isSubmitting || isSubmittingExternally;
+  const values = watch();
+  const validationResult = useMemo(() => registerSchema.safeParse(values), [values]);
+  const fieldErrors = useMemo(
+    () => (validationResult.success ? {} : validationResult.error.flatten().fieldErrors),
+    [validationResult]
+  );
 
-  const handleValidSubmit = handleSubmit(async (values) => {
-    await onSubmit?.(values);
-  });
+  const emailErrors =
+    touchedFields.email && fieldErrors.email?.length ? fieldErrors.email : undefined;
+  const passwordErrors =
+    touchedFields.password && fieldErrors.password?.length ? fieldErrors.password : undefined;
+  const confirmErrors =
+    touchedFields.confirmPassword && fieldErrors.confirmPassword?.length
+      ? fieldErrors.confirmPassword
+      : undefined;
+
+  const pending = isSubmitting || isSubmittingExternally;
+  const isSubmitDisabled = pending || !validationResult.success;
+
+  const handleValidSubmit = handleSubmit(
+    async (formValues) => {
+      await onSubmit?.(formValues);
+    },
+    () => undefined
+  );
+
+  const handleFormSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+    await handleValidSubmit(event);
+  };
 
   return (
     <Stack
       component="form"
       spacing={2.5}
-      onSubmit={handleValidSubmit}
+      onSubmit={handleFormSubmit}
       noValidate
     >
       <TextField
@@ -50,8 +77,8 @@ export function RegisterForm({
         type="email"
         autoComplete="email"
         placeholder="you@example.com"
-        error={Boolean(errors.email)}
-        helperText={errors.email?.message}
+        error={Boolean(emailErrors)}
+        helperText={emailErrors?.join(" ") ?? " "}
         {...register("email")}
       />
 
@@ -60,8 +87,8 @@ export function RegisterForm({
         type="password"
         autoComplete="new-password"
         placeholder="••••••••"
-        error={Boolean(errors.password)}
-        helperText={errors.password?.message}
+        error={Boolean(passwordErrors)}
+        helperText={passwordErrors?.join(" ") ?? " "}
         {...register("password")}
       />
 
@@ -70,8 +97,8 @@ export function RegisterForm({
         type="password"
         autoComplete="new-password"
         placeholder="Repeat your password"
-        error={Boolean(errors.confirmPassword)}
-        helperText={errors.confirmPassword?.message}
+        error={Boolean(confirmErrors)}
+        helperText={confirmErrors?.join(" ") ?? " "}
         {...register("confirmPassword")}
       />
 
@@ -80,7 +107,7 @@ export function RegisterForm({
         variant="contained"
         size="large"
         disableElevation
-        disabled={pending}
+        disabled={isSubmitDisabled}
         fullWidth
       >
         {pending ? "Creating account..." : submitLabel}

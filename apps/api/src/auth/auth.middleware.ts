@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import asyncHandler from "express-async-handler";
-import { verifyToken } from "./auth.utils";
+import { AUTH_COOKIE_NAME, verifyToken } from "./auth.utils";
 import { prisma } from "@samuel-oak/db";
 
 export const protect = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -8,6 +8,8 @@ export const protect = asyncHandler(async (req: Request, res: Response, next: Ne
 
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies?.[AUTH_COOKIE_NAME]) {
+    token = req.cookies[AUTH_COOKIE_NAME];
   }
 
   if (!token) {

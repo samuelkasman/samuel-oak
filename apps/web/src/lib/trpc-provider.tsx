@@ -31,15 +31,11 @@ export function TrpcProvider({ children }: TrpcProviderProps) {
         }),
         httpBatchLink({
           url: `${webEnv.apiBaseUrl}/trpc`,
-          headers() {
-            const headers: Record<string, string> = {};
-            if (typeof window !== "undefined") {
-              const token = window.localStorage.getItem("token");
-              if (token) {
-                headers.Authorization = `Bearer ${token}`;
-              }
-            }
-            return headers;
+          fetch(url, options) {
+            return fetch(url, {
+              ...options,
+              credentials: "include",
+            });
           },
         }),
       ],
