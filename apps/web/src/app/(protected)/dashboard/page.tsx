@@ -1,12 +1,11 @@
 "use client";
 
 import { Grid2 as Grid, Paper, Stack, Typography } from "@mui/material";
-import { AuthGuard } from "../../components/auth";
-import { DashboardLayout } from "../../components/layouts";
-import { trpc } from "../../lib/trpc";
+import { DashboardLayout } from "../../../components/layouts";
+import { trpcClient } from "../../../lib/trpc-client";
 
 export default function DashboardPage() {
-  const helloQuery = trpc.hello.useQuery({ name: "from dashboard" });
+  const helloQuery = trpcClient.hello.useQuery({ name: "from dashboard" });
   const greetingMessage = helloQuery.isLoading
     ? "Contacting tRPC API…"
     : helloQuery.error
@@ -14,7 +13,6 @@ export default function DashboardPage() {
       : helloQuery.data?.message ?? "Connected to tRPC backend";
 
   return (
-    <AuthGuard loadingMessage="Verifying your session…">
       <DashboardLayout title="Dashboard">
         <Stack spacing={4}>
           <Stack spacing={1}>
@@ -52,7 +50,6 @@ export default function DashboardPage() {
           </Grid>
         </Stack>
       </DashboardLayout>
-    </AuthGuard>
   );
 }
 

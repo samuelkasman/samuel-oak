@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
-import { trpc } from "./trpc";
+import { trpcClient } from "./trpc-client";
 import { webEnv } from "./env";
 
 type TrpcProviderProps = {
@@ -23,8 +23,8 @@ export function TrpcProvider({ children }: TrpcProviderProps) {
       })
   );
 
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
+  const [trpcClientInstance] = useState(() =>
+    trpcClient.createClient({
       links: [
         loggerLink({
           enabled: () => process.env.NODE_ENV === "development",
@@ -43,9 +43,9 @@ export function TrpcProvider({ children }: TrpcProviderProps) {
   );
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+    <trpcClient.Provider client={trpcClientInstance} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </trpc.Provider>
+    </trpcClient.Provider>
   );
 }
 

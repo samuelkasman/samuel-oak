@@ -5,7 +5,7 @@ import { protect } from "./auth/auth.middleware";
 import { prisma } from "@samuel-oak/db";
 import jwt from "jsonwebtoken";
 import * as trpcExpress from "@trpc/server/adapters/express";
-import { appRouter } from "./trpc/appRouter";
+import { appRouter } from "./routers";
 import { createContext } from "./trpc/context";
 import { apiEnv } from "./config/env";
 import { AUTH_COOKIE_NAME } from "./auth/auth.utils";

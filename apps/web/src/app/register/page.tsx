@@ -1,19 +1,26 @@
 "use client";
 
+import { useEffect } from "react";
 import { Alert, Box, Container, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { RegisterCard } from "../../components/auth";
 import type { RegisterFormValues } from "../../validation/auth/schemas";
-import { trpc } from "../../lib/trpc";
+import { trpcClient } from "../../lib/trpc-client";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const meQuery = trpc.me.useQuery(undefined, {
+  const meQuery = trpcClient.me.useQuery(undefined, {
     staleTime: 60_000,
   });
 
-  const utils = trpc.useUtils();
-  const registerMutation = trpc.auth.register.useMutation({
+  useEffect(() => {
+    if (meQuery.data) {
+      router.replace("/dashboard");
+    }
+  }, [meQuery.data, router]);
+
+  const utils = trpcClient.useUtils();
+  const registerMutation = trpcClient.auth.register.useMutation({
     onSuccess: async () => {
       await utils.me.invalidate();
       router.push("/dashboard");
@@ -30,8 +37,7 @@ export default function RegisterPage() {
       ? "Unable to create account. Please try again."
       : null);
 
-  if (meQuery.isSuccess) {
-    router.replace("/dashboard");
+  if (meQuery.data) {
     return null;
   }
 

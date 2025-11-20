@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { type ReactNode } from "react";
-import { trpc } from "../../lib/trpc";
+import { trpcClient } from "../../lib/trpc-client";
 import { useLogout } from "../../hooks/useLogout";
 
 type DashboardLayoutProps = {
@@ -24,7 +24,7 @@ export function DashboardLayout({
   children,
   title = "Dashboard",
 }: DashboardLayoutProps) {
-  const meQuery = trpc.me.useQuery(undefined, { staleTime: 60_000 });
+  const meQuery = trpcClient.me.useQuery(undefined, { staleTime: 60_000 });
   const { logout, isLoading: isLoggingOut } = useLogout();
 
   const userInitial =

@@ -7,9 +7,9 @@ import {
   setAuthCookie,
   clearAuthCookie,
 } from "../auth/auth.utils";
-import { router, publicProcedure, protectedProcedure } from "./trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc/trpc";
 
-const authRouter = router({
+export const authRouter = createTRPCRouter({
   register: publicProcedure
     .input(
       z.object({
@@ -86,22 +86,4 @@ const authRouter = router({
   }),
 });
 
-export const appRouter = router({
-  hello: publicProcedure
-    .input(z.object({ name: z.string().optional() }))
-    .query(({ input }) => {
-      return { message: `Hello ${input?.name ?? "stranger"}` };
-    }),
 
-  auth: authRouter,
-
-  me: protectedProcedure.query(({ ctx }) => {
-    return ctx.user; // user from JWT!
-  }),
-
-  getUsers: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.prisma.user.findMany();
-  }),
-});
-
-export type AppRouter = typeof appRouter;

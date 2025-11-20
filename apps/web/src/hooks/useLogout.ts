@@ -3,14 +3,14 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { trpc } from "../lib/trpc";
+import { trpcClient } from "../lib/trpc-client";
 
 export function useLogout(redirectTo: string = "/login") {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const utils = trpc.useUtils();
+  const utils = trpcClient.useUtils();
 
-  const logoutMutation = trpc.auth.logout.useMutation({
+  const logoutMutation = trpcClient.auth.logout.useMutation({
     onSuccess: async () => {
       await Promise.all([
         queryClient.clear(),

@@ -1,19 +1,26 @@
 "use client";
 
+import { useEffect } from "react";
 import { Alert, Box, Container, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { LoginCard } from "../../components/auth";
 import type { LoginFormValues } from "../../validation/auth/schemas";
-import { trpc } from "../../lib/trpc";
+import { trpcClient } from "../../lib/trpc-client";
 
 export default function LoginPage() {
   const router = useRouter();
-  const meQuery = trpc.me.useQuery(undefined, {
+  const meQuery = trpcClient.me.useQuery(undefined, {
     staleTime: 60_000,
   });
 
-  const utils = trpc.useUtils();
-  const loginMutation = trpc.auth.login.useMutation({
+  useEffect(() => {
+    if (meQuery.data) {
+      router.replace("/dashboard");
+    }
+  }, [meQuery.data, router]);
+
+  const utils = trpcClient.useUtils();
+  const loginMutation = trpcClient.auth.login.useMutation({
     onSuccess: async () => {
       await utils.me.invalidate();
       router.push("/dashboard");
@@ -28,8 +35,7 @@ export default function LoginPage() {
     loginMutation.error?.message ??
     (loginMutation.isError ? "Unable to sign in. Please try again." : null);
 
-  if (meQuery.isSuccess) {
-    router.replace("/dashboard");
+  if (meQuery.data) {
     return null;
   }
 

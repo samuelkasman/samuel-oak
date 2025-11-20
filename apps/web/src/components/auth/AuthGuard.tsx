@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { CircularProgress, Stack, Typography } from "@mui/material";
-import { trpc } from "../../lib/trpc";
+import { trpcClient } from "../../lib/trpc-client";
 
 type AuthGuardProps = {
   children: ReactNode;
@@ -17,16 +17,18 @@ export function AuthGuard({
   loadingMessage = "Checking your session…",
 }: AuthGuardProps) {
   const router = useRouter();
-  const meQuery = trpc.me.useQuery(undefined, {
+  const meQuery = trpcClient.me.useQuery(undefined, {
     retry: false,
     staleTime: 60_000,
   });
 
+  const isUnauthenticated = meQuery.status === "success" && !meQuery.data;
+
   useEffect(() => {
-    if (meQuery.isError) {
+    if (isUnauthenticated) {
       router.replace(redirectTo);
     }
-  }, [meQuery.isError, redirectTo, router]);
+  }, [isUnauthenticated, redirectTo, router]);
 
   if (meQuery.isLoading) {
     return (
@@ -42,6 +44,10 @@ export function AuthGuard({
         </Typography>
       </Stack>
     );
+  }
+
+  if (isUnauthenticated) {
+    return null;
   }
 
   if (meQuery.isError) {

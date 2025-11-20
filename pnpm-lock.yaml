@@ -142,9 +142,18 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.5
+      '@types/express-serve-static-core':
+        specifier: 5.1.0
+        version: 5.1.0
       '@types/node':
         specifier: ^22.15.3
         version: 22.15.3
+      '@types/qs':
+        specifier: 6.14.0
+        version: 6.14.0
       '@types/react':
         specifier: 19.2.2
         version: 19.2.2
